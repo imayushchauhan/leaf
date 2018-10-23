@@ -1,0 +1,10 @@
+{
+  "development": {
+    "appConfig": {
+      "port": 3000
+    },
+    "dbConfig": {
+      "url": "mongodb://leaf:leaf123@ds237713.mlab.com:37713/leaf"
+    }
+  }
+}

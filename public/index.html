@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+    <script type="text/javascript" src="https://unpkg.com/mqtt@2.18.8/dist/mqtt.min.js"></script>
+</head>
+
+<body>
+<form>
+    Send agent location to consumer via MQTT:<br><br>
+    <input type="text" id="lat" placeholder="lat">
+    <input type="text" id="long" placeholder="long">
+    <input type="button" value="Send" onclick="sendAgentLocation()">
+    <br><br><br><br>
+    Receive agent location from agent via MQTT:<br><br>
+    Lat: <p id="latitude"></p>
+    Long: <p id="longitude"></p>
+</form>
+</body>
+<script>
+    var client = mqtt.connect('ws://broker.hivemq.com:8000/mqtt');
+    function sendAgentLocation() {
+        var lat = document.getElementById('lat').value;
+        var long = document.getElementById('long').value;
+        if(!lat || !long){
+            alert("Add lat n long!!!");
+            return;
+        }
+
+        var locationObj = {
+            agentId: "5bcc7ae6b560731784678f80",
+            location: {
+                lat: lat,
+                long: long
+            }
+        };
+        client.publish('agent_location', JSON.stringify(locationObj));
+    }
+
+    client.on('connect', function () {
+        client.subscribe("5bcc68356135c102bce55f48", function (err) {
+            if (!err) {
+                client.on('message', (topic, message) => {
+                    var locationObj = JSON.parse(message);
+                    document.getElementById('latitude').innerHTML = locationObj.location.lat;
+                    document.getElementById('longitude').innerHTML = locationObj.location.long;
+                });
+            }
+        });
+    });
+</script>
+</html>
